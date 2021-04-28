@@ -5,8 +5,8 @@
 #include <unistd.h>
 #include <iostream>
 
-#include "../include/ntt.h"	/* naiveNTT(), outOfPlaceNTT_DIT() */
-#include "../include/utils.h"	/* printVec() */
+#include "../../include/vanilla/ntt.h"	/* naiveNTT(), outOfPlaceNTT_DIT() */
+#include "../../include/vanilla/utils.h"	/* printVec() */
 
 using namespace std;
 

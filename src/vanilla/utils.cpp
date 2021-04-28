@@ -4,7 +4,7 @@
 #include <ctime>		/* time() */
 #include <iostream> 		/* std::cout, std::endl */
 
-#include "../include/utils.h" 	//INCLUDE HEADER FILE
+#include "../../include/vanilla/utils.h" 	//INCLUDE HEADER FILE
 
 /**
  * Return vector with each element of the input at its bit-reversed position
