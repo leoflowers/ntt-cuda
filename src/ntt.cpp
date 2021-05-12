@@ -3,8 +3,9 @@
 #include <cstdlib> 		/* malloc() */
 #include <iostream>
 
-#include "../../include/utils.h"	/* bit_reverse(), modExp(), modulo() */
-#include "../../include/ntt.h" 	//INCLUDE HEADER FILE
+#include "../include/utils.h"	/* bit_reverse(), modExp(), modulo() */
+#include "../include/ntt.h" 	//INCLUDE HEADER FILE
+
 
 /**
  * Perform an in-place iterative breadth-first decimation-in-time Cooley-Tukey NTT on an input vector and return the result

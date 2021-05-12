@@ -3,6 +3,7 @@
 
 #include <cstdint> 	/* int64_t, uint64_t */
 #include <cstdlib>	/* RAND_MAX */
+#include <cuda.h>
 
 /**
  * Return vector with each element of the input at its bit-reversed position

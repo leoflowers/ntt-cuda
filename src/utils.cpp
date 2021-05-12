@@ -4,7 +4,7 @@
 #include <ctime>		/* time() */
 #include <iostream> 		/* std::cout, std::endl */
 
-#include "../../include/utils.h" 	//INCLUDE HEADER FILE
+#include "../include/utils.h" 	//INCLUDE HEADER FILE
 
 /**
  * Return vector with each element of the input at its bit-reversed position
@@ -82,11 +82,8 @@ uint64_t modExp(uint64_t base, uint64_t exp, uint64_t m){
 	uint64_t result = 1;
 	
 	while(exp > 0){
-
 		if(exp % 2){
-
 			result = modulo(result*base, m);
-
 		}
 
 		exp = exp >> 1;
