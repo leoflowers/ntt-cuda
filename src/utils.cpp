@@ -142,4 +142,28 @@ uint64_t *randVec(uint64_t n, uint64_t max){
 	}
 
 	return vec;
+
+}
+
+uint64_t *offlineModExp(uint64_t r, uint64_t p, uint64_t n) {
+	// dimension of table: a 
+	uint64_t m = log2(n);
+
+	uint64_t *k;
+	k = (uint64_t *)malloc(m*m * sizeof(uint64_t));		// first dimension is a
+
+	for(int i = 0; i < m; i++) {
+		for(int j = 0; j < m; j++) {
+			if(j == 0) {
+				uint64_t k_ = (p-1) / (pow(2, i+1));
+				*(k + i*m + j) = modExp(r, k_, p);
+			}
+			else {
+				*(k + i*m + j) = modExp(*(k + i*m), m-1, p); 
+			}	
+		}		
+		
+	}
+	
+	return k;
 }

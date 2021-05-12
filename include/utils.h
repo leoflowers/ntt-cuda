@@ -60,4 +60,6 @@ void printVec(uint64_t *vec, uint64_t n);
  */
 uint64_t *randVec(uint64_t n, uint64_t max=RAND_MAX);
 
+uint64_t *offlineModExp(uint64_t r, uint64_t p, uint64_t n);
+
 #endif

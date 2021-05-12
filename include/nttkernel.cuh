@@ -15,5 +15,8 @@
  * @return 	The transformed vector
  */
 __host__
-uint64_t *inPlaceNTT_DIT_parallel(uint64_t *h_vec, uint64_t n, uint64_t p, uint64_t r, bool rev);
+uint64_t *inPlaceNTT_DIT_parallel(uint64_t *h_vec, uint64_t n, uint64_t p, uint64_t r, bool rev, const uint64_t *offline);
+
+__host__
+uint64_t **inPlaceNTT_DIT_parallel_batched(int batch_size, uint64_t **h_vecs, uint64_t n, uint64_t p, uint64_t r, bool rev, const uint64_t *table);
 #endif
