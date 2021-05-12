@@ -15,8 +15,8 @@ NVCC = nvcc
 %.cu.o: %.cu $(DEPS)
 	$(NVCC) -g -G -c -o $@ $< -Iinclude -dc
 
-ntt-kernel: $(COBJ_FILES) $(OBJ_FILES)
-	$(NVCC) -g -o $@ $< -Iinclude
+ntt-kernel: $(OBJ_FILES) $(COBJ_FILES)
+	$(NVCC) -g -G -o $@ $(OBJ_FILES) $(COBJ_FILES) -Iinclude
 
 clean:
 	rm -rfv ntt ntt-kernel $(OBJ_FILES) $(COBJ_FILES)
