@@ -116,6 +116,10 @@ in slope. This is expected due to the parallel nature of the GPU. However, this 
 surprising as I was expecting the sheer number of threads running on our SM on the GPU
 to affect thread switches. However, this did not turn out to be the case (thankfully).
 Although, I am sure that for full size workloads, this would not scale as nicely.
+Note that the discrepancy between the red and blue line is due to running those tests
+on different GPUS. The green, black (hidden underneath the green), and red plots were
+on RTX 8000s while the blue plot was on a V100. Otherwise, the blue and red plots
+would have been basically on top of each other.
 
 Implementation of batching was pretty straightforward. I created another `__host__` kernel
 that takes in a double pointer, each of the pointers pointing to each of the input vectors.
