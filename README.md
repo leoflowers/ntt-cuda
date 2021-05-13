@@ -108,7 +108,7 @@ to the table. The kernel will read from the table if it is present, otherwise it
 with online computation. 
 
 ## Batching
-![alt text](https://github.com/leoflowers/ntt-cuda/blob/master/figs/plot.png?raw=true)
+![alt text](https://github.com/leoflowers/ntt-cuda/blob/master/figs/new_plot.png?raw=true)
 
 Batching came with the expected (yet still surprising) results: times scales linearly as
 batch size increases. This is very evident from the plot above, aside from the differences
