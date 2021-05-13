@@ -1,4 +1,4 @@
-# Project repository for ECE-GY 9143 semester project. 
+# ECE-GY 9143 Project - NTT-CUDA 
 
 This project involved taking a sequential version of the Cooley-Tukey NTT algorithm and using
 CUDA to parallelize the code for use with GPUs. 
