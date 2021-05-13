@@ -12,74 +12,53 @@ void kernel_loop_body(int c, uint64_t p, uint64_t n, uint64_t a, uint64_t m, uin
 	
 	uint64_t l = threadIdx.x;
 	uint64_t j;
-	
-	if(table == nullptr) {
-		if(single_thread) {							// some threads have to run the whole kernel due to poor items-per-thread scaling 
-			for(j = 0; j < n; j+=m) {
-				for(uint64_t k = 0; k < m/2; k++) {
-					uint64_t j1 = j+k;
-					uint64_t j2 = j1 + (m/2);
+	uint64_t y = c/2;
 
-					if(j1 < n && j2 < n) {
-						uint64_t factor1 = d_result[j1];
-						uint64_t factor2 = modulo_k(modExp_k(a, k, p) * d_result[j2], p);
-			
-						d_result[j1] 		= modulo_k(factor1 + factor2, p);
-						d_result[j2] 		= modulo_k(factor1 - factor2, p);
-					}
-				}
-			}
-		}
-		else {
-			j = m*l;							// more parallelism to be extracted from here
+	if(single_thread) {							 
+		for(j = 0; j < n; j+=m) {
 			for(uint64_t k = 0; k < m/2; k++) {
 				uint64_t j1 = j+k;
 				uint64_t j2 = j1 + (m/2);
 
 				if(j1 < n && j2 < n) {
 					uint64_t factor1 = d_result[j1];
-					uint64_t factor2 = modulo_k(modExp_k(a, k, p) * d_result[j2], p);
+					
+					// sets up arg depending on online/offline
+					uint64_t arg;
+					if(table == nullptr) 
+						arg = modExp_k(a, k, p); 
+					else
+						arg = *(table + (c*y)  + (k+1));
+					uint64_t factor2 = modulo_k(arg * d_result[j2], p);
 			
 					d_result[j1] 		= modulo_k(factor1 + factor2, p);
 					d_result[j2] 		= modulo_k(factor1 - factor2, p);
 				}
 			}
 		}
-	} else { 
-		int y = c/2;
-		if(single_thread) {                                                     // some threads have to run the whole kernel due to poor items-per-thread scaling 
-                        for(j = 0; j < n; j+=m) {
-                                for(uint64_t k = 0; k < m/2; k++) {
-                                        uint64_t j1 = j+k;
-                                        uint64_t j2 = j1 + (m/2);
-
-                                        if(j1 < n && j2 < n) {
-						uint64_t factor1 = d_result[j1];
-                                                uint64_t factor2 = modulo_k(*(table + (c*y)  + (k+1)) * d_result[j2], p);
-
-                                                d_result[j1]            = modulo_k(factor1 + factor2, p);
-                                                d_result[j2]            = modulo_k(factor1 - factor2, p);
-                                        }
-                                }
-                        }
-                }
-                else {
-                        j = m*l;                                                        // more parallelism to be extracted from here
-                        for(uint64_t k = 0; k < m/2; k++) {
-                                uint64_t j1 = j+k;
-                                uint64_t j2 = j1 + (m/2);
-
-                                if(j1 < n && j2 < n) {
-                                        uint64_t factor1 = d_result[j1];
-                                        uint64_t factor2 = modulo_k(*(table + (c*y) + (k+1)) * d_result[j2], p);
-
-                                        d_result[j1]            = modulo_k(factor1 + factor2, p);
-                                        d_result[j2]            = modulo_k(factor1 - factor2, p);
-                                }
-                        }
-                }
 	}
+	else {
+		j = m*l;				// more parallelism to be extracted from here
+		for(uint64_t k = 0; k < m/2; k++) {
+			uint64_t j1 = j+k;
+			uint64_t j2 = j1 + (m/2);
 
+			if(j1 < n && j2 < n) {
+				uint64_t factor1 = d_result[j1];
+				
+				// sets up arg depending on online/offline
+                                uint64_t arg;
+                                if(table == nullptr)
+                                	arg = modExp_k(a, k, p);
+                                else
+                                        arg = *(table + (c*y)  + (k+1));
+				uint64_t factor2 = modulo_k(arg * d_result[j2], p);
+		
+				d_result[j1] 		= modulo_k(factor1 + factor2, p);
+				d_result[j2] 		= modulo_k(factor1 - factor2, p);
+			}
+		}
+	}
 }
 
 
@@ -88,38 +67,28 @@ void inPlaceNTT_kernel(int c, uint64_t p, uint64_t n, uint64_t r, uint64_t *d_ve
 	
 	uint64_t i;
 	if(threadIdx.x < 13)
-		i = threadIdx.x + 1; 						// this will be given to thread according to block index
+		i = threadIdx.x + 1;			// this will be given to thread according to block index
 	else
 		return;
 	
 
-	uint64_t m = powf(2.0, (float)i);					// calculated within kernel
+	uint64_t m = powf(2.0, (float)i);		// calculated within kernel
 	uint64_t k_ = (p - 1)/m;
 	uint64_t a;
-	if(table != nullptr){ 	// we need to pass p into kernel
+	if(table != nullptr) 	
 		a = *(table + (i-1)*c);
-	} else {
-		a = modExp_k(r, k_, p);	// calculated within kernel
-	}
+	else 
+		a = modExp_k(r, k_, p);	
 
 
 	// spawns threads as necessary
 	__syncthreads();
-	if(i == 13) {
+	if(i == 13) 
 		cudaDeviceSynchronize();
-	}
-	else if(i < 4) {
-		if(table == nullptr)
-			kernel_loop_body<<<1, 1>>>(c, p, n, a, m, d_vec, d_result, true, nullptr);
-		else
-			kernel_loop_body<<<1, 1>>>(c, p, n, a, m, d_vec, d_result, true, table); 
-	}
-	else if(i < 13 && i >= 4){
-		if(table == nullptr)
-			kernel_loop_body<<<1, (n/m)>>>(c, p, n, a, m, d_vec, d_result, false, nullptr);
-		else
-			kernel_loop_body<<<1, (n/m)>>>(c, p, n, a, m, d_vec, d_result, false, table);
-	}
+	else if(i < 4) 
+		kernel_loop_body<<<1, 1>>>(c, p, n, a, m, d_vec, d_result, true, table); 
+	else if(i < 13 && i >= 4)
+		kernel_loop_body<<<1, (n/m)>>>(c, p, n, a, m, d_vec, d_result, false, table);
 	__syncthreads();
 }
 
